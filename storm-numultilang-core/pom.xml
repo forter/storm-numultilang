@@ -5,13 +5,13 @@
     <parent>
         <artifactId>storm-numultilang-parent</artifactId>
         <groupId>com.forter</groupId>
-        <version>0.1.0</version>
+        <version>0.1.1</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>storm-numultilang-core</artifactId>
     <packaging>jar</packaging>
-    <version>0.1.0</version>
+    <version>0.1.1</version>
     <dependencies>
         <dependency>
             <groupId>org.apache.storm</groupId>
