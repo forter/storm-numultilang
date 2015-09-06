@@ -1,0 +1,43 @@
+language: java
+jdk: oraclejdk7
+script:
+- mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V -Pproduction
+- mvn test -B
+
+deploy:
+  - provider: s3
+    access_key_id:
+      secure: "nIqCrEz0O2nr9Y3TfVjktqr+EVOG/HCha4f5VVQkW3Iz8qlRHVrxovf/vxuTXgq3mGxVIYOWLn06L9t1mQ4S3rOKiV+g7iFv5Q61FWyR0zr47plS1MFY7snRIfMpUgm7dJLXf6MJc9py4EeYVxN5v9BXSA6yAke6zSBkGkDpO9vkx5DI/Ojfky4W3m/UE6zXjRqj3agJY2HRtljPJfkatYnygTog5ZPcqHnwUXj6wUhBGAF77zShPJAf6MOY4aUVLpoxgOlfj2708kWuQUuWzwj9KfxAFgdJCVVedQCtpKrtbKMWZrh0Q9XGIXqUMGC240QvHooXstpmaCPWikMnCxjG3idU8sFMDRrtGLn2+A94Q/2a7WdAXiv0JrBkiQH/8wSDzu/+8S/TaVzA69AMRn+js0LrEqudmdAHDj87QEElurIXv7lh5hf818phCxbYxzP/yWnNKOtWWk8cwwXjOvFGhOJrXVU/hDmXiqRKKukXnej4yo+B47ek0f54LiXp2fZQP3P5gYNjF6vd0xChJbrSc1e97RZxC+ycJgFpRX13u7rDOeHCEIeZFp+OnRBQ+8VWbCLQlweGchqVSeD9PpLZkP2XHa/wJrxEym/nWN2N9SxUlJvoyfl7lDBGyqggimY4Br+0P2bqojquqkxSeMpNUM4Xetwifh9E2X0SQSw="
+    secret_access_key:
+      secure: "YQou2vEoZNLZGeoRn7VfTG8jnZ91KfLslPJUoiX7io2acbbk9UmRlVotOAHivwnSldWvCqD4EXOloi7GU+hTn1eh1PdRTP6wTR9GaE+hERyqDAjuOQDZtmozVTnAIciPgXTpKs35r9pR+lV822FjJt6LxxSSQC1ZhSqJzUUgxTr3qsV98Ylu1IlgiyN8DKUAea1nAq0oNxLcRNLcZddJzAQz+qCA+oqu9HZPk7eczegDZjz/zgXc33/ZZC/PUsK6twcb3bDExoBRyGtfDaoDT5iLuN4cdyEGrm74zwS8UmC/Q4lKuc870t4RzoleqgkLPVzd/OljUkHXlxbNJCfCZ4VYlTLpCFtIMEasiYbQonMVIGmBiQN7dRQaUV+mVsOrB20HwdZH7p5X11tdI2+ItisWZ+eNhlSWdcMMszJil9N9nNnJDdkXzb7RMb78WejvrVItFpD5wI6PBcEpI8IWf3q39O1a6Cb0C1H97InsyKWBDyyh0joNTw6gu9i8GgJshWq9JU53wJYHzPLEJ4fp0/NF+x61UIrkJ/hKj58BN+vgWjx+NXDtaJZMgAdLMMKvSBh7DfPNCYpwvDQOFBdtgjKuf5PjAA0oXYYVSbFy+5QdXQh2nrHNP/dKLL+denUHATlDTT3pRX+SjlTjPuIvn7Cb3y9hlhYlpza8nY+s+OM="
+    bucket: oss.forter.com
+    local-dir: /home/travis/.m2/repository/com/forter/storm-numultilang-parent/
+    upload-dir: repository/com/forter/storm-numultilang-parent
+    skip_cleanup: true
+    on:
+      all_branches: true
+      tags: true
+  - provider: s3
+    access_key_id:
+      secure: "nIqCrEz0O2nr9Y3TfVjktqr+EVOG/HCha4f5VVQkW3Iz8qlRHVrxovf/vxuTXgq3mGxVIYOWLn06L9t1mQ4S3rOKiV+g7iFv5Q61FWyR0zr47plS1MFY7snRIfMpUgm7dJLXf6MJc9py4EeYVxN5v9BXSA6yAke6zSBkGkDpO9vkx5DI/Ojfky4W3m/UE6zXjRqj3agJY2HRtljPJfkatYnygTog5ZPcqHnwUXj6wUhBGAF77zShPJAf6MOY4aUVLpoxgOlfj2708kWuQUuWzwj9KfxAFgdJCVVedQCtpKrtbKMWZrh0Q9XGIXqUMGC240QvHooXstpmaCPWikMnCxjG3idU8sFMDRrtGLn2+A94Q/2a7WdAXiv0JrBkiQH/8wSDzu/+8S/TaVzA69AMRn+js0LrEqudmdAHDj87QEElurIXv7lh5hf818phCxbYxzP/yWnNKOtWWk8cwwXjOvFGhOJrXVU/hDmXiqRKKukXnej4yo+B47ek0f54LiXp2fZQP3P5gYNjF6vd0xChJbrSc1e97RZxC+ycJgFpRX13u7rDOeHCEIeZFp+OnRBQ+8VWbCLQlweGchqVSeD9PpLZkP2XHa/wJrxEym/nWN2N9SxUlJvoyfl7lDBGyqggimY4Br+0P2bqojquqkxSeMpNUM4Xetwifh9E2X0SQSw="
+    secret_access_key:
+      secure: "YQou2vEoZNLZGeoRn7VfTG8jnZ91KfLslPJUoiX7io2acbbk9UmRlVotOAHivwnSldWvCqD4EXOloi7GU+hTn1eh1PdRTP6wTR9GaE+hERyqDAjuOQDZtmozVTnAIciPgXTpKs35r9pR+lV822FjJt6LxxSSQC1ZhSqJzUUgxTr3qsV98Ylu1IlgiyN8DKUAea1nAq0oNxLcRNLcZddJzAQz+qCA+oqu9HZPk7eczegDZjz/zgXc33/ZZC/PUsK6twcb3bDExoBRyGtfDaoDT5iLuN4cdyEGrm74zwS8UmC/Q4lKuc870t4RzoleqgkLPVzd/OljUkHXlxbNJCfCZ4VYlTLpCFtIMEasiYbQonMVIGmBiQN7dRQaUV+mVsOrB20HwdZH7p5X11tdI2+ItisWZ+eNhlSWdcMMszJil9N9nNnJDdkXzb7RMb78WejvrVItFpD5wI6PBcEpI8IWf3q39O1a6Cb0C1H97InsyKWBDyyh0joNTw6gu9i8GgJshWq9JU53wJYHzPLEJ4fp0/NF+x61UIrkJ/hKj58BN+vgWjx+NXDtaJZMgAdLMMKvSBh7DfPNCYpwvDQOFBdtgjKuf5PjAA0oXYYVSbFy+5QdXQh2nrHNP/dKLL+denUHATlDTT3pRX+SjlTjPuIvn7Cb3y9hlhYlpza8nY+s+OM="
+    bucket: oss.forter.com
+    local-dir: /home/travis/.m2/repository/com/forter/storm-numultilang-core/
+    upload-dir: repository/com/forter/storm-numultilang-core
+    skip_cleanup: true
+    on:
+      all_branches: true
+      tags: true
+  - provider: s3
+    access_key_id:
+      secure: "nIqCrEz0O2nr9Y3TfVjktqr+EVOG/HCha4f5VVQkW3Iz8qlRHVrxovf/vxuTXgq3mGxVIYOWLn06L9t1mQ4S3rOKiV+g7iFv5Q61FWyR0zr47plS1MFY7snRIfMpUgm7dJLXf6MJc9py4EeYVxN5v9BXSA6yAke6zSBkGkDpO9vkx5DI/Ojfky4W3m/UE6zXjRqj3agJY2HRtljPJfkatYnygTog5ZPcqHnwUXj6wUhBGAF77zShPJAf6MOY4aUVLpoxgOlfj2708kWuQUuWzwj9KfxAFgdJCVVedQCtpKrtbKMWZrh0Q9XGIXqUMGC240QvHooXstpmaCPWikMnCxjG3idU8sFMDRrtGLn2+A94Q/2a7WdAXiv0JrBkiQH/8wSDzu/+8S/TaVzA69AMRn+js0LrEqudmdAHDj87QEElurIXv7lh5hf818phCxbYxzP/yWnNKOtWWk8cwwXjOvFGhOJrXVU/hDmXiqRKKukXnej4yo+B47ek0f54LiXp2fZQP3P5gYNjF6vd0xChJbrSc1e97RZxC+ycJgFpRX13u7rDOeHCEIeZFp+OnRBQ+8VWbCLQlweGchqVSeD9PpLZkP2XHa/wJrxEym/nWN2N9SxUlJvoyfl7lDBGyqggimY4Br+0P2bqojquqkxSeMpNUM4Xetwifh9E2X0SQSw="
+    secret_access_key:
+      secure: "YQou2vEoZNLZGeoRn7VfTG8jnZ91KfLslPJUoiX7io2acbbk9UmRlVotOAHivwnSldWvCqD4EXOloi7GU+hTn1eh1PdRTP6wTR9GaE+hERyqDAjuOQDZtmozVTnAIciPgXTpKs35r9pR+lV822FjJt6LxxSSQC1ZhSqJzUUgxTr3qsV98Ylu1IlgiyN8DKUAea1nAq0oNxLcRNLcZddJzAQz+qCA+oqu9HZPk7eczegDZjz/zgXc33/ZZC/PUsK6twcb3bDExoBRyGtfDaoDT5iLuN4cdyEGrm74zwS8UmC/Q4lKuc870t4RzoleqgkLPVzd/OljUkHXlxbNJCfCZ4VYlTLpCFtIMEasiYbQonMVIGmBiQN7dRQaUV+mVsOrB20HwdZH7p5X11tdI2+ItisWZ+eNhlSWdcMMszJil9N9nNnJDdkXzb7RMb78WejvrVItFpD5wI6PBcEpI8IWf3q39O1a6Cb0C1H97InsyKWBDyyh0joNTw6gu9i8GgJshWq9JU53wJYHzPLEJ4fp0/NF+x61UIrkJ/hKj58BN+vgWjx+NXDtaJZMgAdLMMKvSBh7DfPNCYpwvDQOFBdtgjKuf5PjAA0oXYYVSbFy+5QdXQh2nrHNP/dKLL+denUHATlDTT3pRX+SjlTjPuIvn7Cb3y9hlhYlpza8nY+s+OM="
+    bucket: oss.forter.com
+    local-dir: /home/travis/.m2/repository/com/forter/storm-numultilang-json/
+    upload-dir: repository/com/forter/storm-numultilang-json
+    skip_cleanup: true
+    on:
+      all_branches: true
+      tags: true
