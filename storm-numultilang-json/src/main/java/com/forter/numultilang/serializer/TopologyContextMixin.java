@@ -1,7 +1,8 @@
 package com.forter.numultilang.serializer;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NONE)
+@JsonSerialize(using = TopologyContextCustomSerializer.class)
 public class TopologyContextMixin {
+
 }

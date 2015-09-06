@@ -142,11 +142,11 @@ public class NuShellBolt implements IBolt, ShellMsgListener, ShellProcessErrorLi
     }
 
     protected int getHeartbeatPeriodMillis(Map stormConf) {
-        return (int)TimeUnit.SECONDS.toMillis(10);
+        return Integer.valueOf(String.valueOf(stormConf.get(NuShellConfig.TOPOLOGY_NUMULTILANG_HEARTBEAT_PERIOD_MS)));
     }
 
     protected int getHeartbeatTimeoutMillis(Map stormConf) {
-        return (int)TimeUnit.SECONDS.toMillis(RT.intCast(stormConf.get(Config.SUPERVISOR_WORKER_TIMEOUT_SECS)));
+        return Integer.valueOf(String.valueOf(stormConf.get(NuShellConfig.TOPOLOGY_NUMULTILANG_HEARTBEAT_TIMEOUT_MS)));
     }
 
     public void execute(Tuple input) {

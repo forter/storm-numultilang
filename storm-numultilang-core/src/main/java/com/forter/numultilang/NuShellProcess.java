@@ -7,6 +7,7 @@ import com.forter.numultilang.messages.ShellBoltMsg;
 import com.forter.numultilang.messages.ShellSetupMsg;
 import com.forter.numultilang.listeners.ShellProcessStdErrListener;
 import com.forter.numultilang.messages.ShellResponseMsg;
+import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.zaxxer.nuprocess.NuProcess;
 import com.zaxxer.nuprocess.NuProcessBuilder;
@@ -14,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
@@ -75,6 +77,12 @@ public class NuShellProcess implements Serializable, ShellMsgListener, ShellProc
         this.setupCountdownLatch = new CountDownLatch(1);
         this.stderrLogMaxLength = Long.valueOf(String.valueOf(conf.get(NuShellConfig.TOPOLOGY_NUMULTILANG_STDERR_MAX_LENGTH)));
         NuProcessBuilder builder = new NuProcessBuilder(command);
+
+        String codeDir = String.valueOf(conf.get(NuShellConfig.TOPOLOGY_NUMULTILANG_CODE_DIR));
+        if (!Strings.isNullOrEmpty(codeDir)) {
+            //bolt uses env value to set the os.dir globally
+            builder.environment().put("CODE_DIR", Paths.get(codeDir).toAbsolutePath().toString());
+        }
 
         //Setting the current directory is not supported by NuProcessBulder
         //This would require the child process to manually change the current working directory

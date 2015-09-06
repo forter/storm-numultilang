@@ -17,6 +17,11 @@
 # limitations under the License.
 
 import os
+
+codedir = os.environ['CODE_DIR']
+if codedir:
+    os.chdir(codedir)
+
 import traceback
 from collections import deque
 
@@ -73,7 +78,7 @@ def readCommand():
 
 def readTuple():
     cmd = readCommand()
-    return Tuple(cmd["id"], cmd["comp"], cmd["stream"], cmd["task"], cmd["tuple"])
+    return Tuple(cmd.get("id"), cmd.get("comp"), cmd.get("stream"), cmd.get("task"), cmd.get("tuple"))
 
 def sendMsgToParent(msg):
     print json_encode(msg)
@@ -160,7 +165,10 @@ def rpcMetrics(name, params):
 def initComponent():
     setupInfo = readMsg()
     sendpid(setupInfo['pidDir'])
-    return [setupInfo['conf'], setupInfo['context']]
+    stormconf = setupInfo['conf']
+    pass
+
+    return [stormconf, setupInfo['context']]
 
 class Tuple(object):
     def __init__(self, id, component, stream, task, values):

@@ -32,10 +32,8 @@ public class PythonTest {
     private IOutputCollector collector;
     private TopologyContext context;
     private BlockingQueue<Object> emitted;
-
-    @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, isGetterVisibility = JsonAutoDetect.Visibility.NONE)
-    public interface TopologyContextMixin {
-    }
+    private Path boltPath;
+    private Map conf;
 
     public class StubCollector implements IOutputCollector {
 
@@ -68,31 +66,32 @@ public class PythonTest {
     @BeforeMethod
     public void beforeMethod() throws IOException {
         emitted = new LinkedBlockingQueue();
-        JacksonShellSerializer.mapper.addMixInAnnotations(TopologyContext.class, TopologyContextMixin.class);
-        String path = "src/test/resources";
-        Path boltFile = Paths.get(path, "splitsentence.py");
-        if (!Files.exists(boltFile)) {
-            boltFile = Paths.get("storm-numultilang-json", boltFile.toString());
-            if (!Files.exists(boltFile)) {
-                throw Throwables.propagate(new FileNotFoundException(path));
+        boltPath = Paths.get("src/test/resources");
+        if (!Files.exists(boltPath)) {
+            boltPath = Paths.get("storm-numultilang-json", boltPath.toString()).toAbsolutePath();
+            if (!Files.exists(boltPath)) {
+                throw Throwables.propagate(new FileNotFoundException(boltPath.toString()));
             }
         }
-        bolt = new NuShellBolt("python", boltFile.toAbsolutePath().toString());
         collector = new StubCollector();
-        Map conf = Maps.newHashMap();
-        conf.put(NuShellConfig.TOPOLOGY_NUMULTILANG_EMIT_TIMEOUT_MS, Long.MAX_VALUE);
-        conf.put(NuShellConfig.TOPOLOGY_NUMULTILANG_SETUP_TIMEOUT_MS, Long.MAX_VALUE);
+        conf = Maps.newHashMap();
+        conf.put(NuShellConfig.TOPOLOGY_NUMULTILANG_EMIT_TIMEOUT_MS, Integer.MAX_VALUE);
+        conf.put(NuShellConfig.TOPOLOGY_NUMULTILANG_SETUP_TIMEOUT_MS, Integer.MAX_VALUE);
         conf.put(NuShellConfig.TOPOLOGY_NUMULTILANG_SERIALIZER, JacksonShellSerializer.class.getCanonicalName());
         conf.put(NuShellConfig.TOPOLOGY_NUMULTILANG_STDERR_MAX_LENGTH, 1024 * 1024);
-        conf.put(Config.SUPERVISOR_WORKER_TIMEOUT_SECS, 1);
+        conf.put(NuShellConfig.TOPOLOGY_NUMULTILANG_STDERR_MAX_LENGTH, 1024 * 1024);
+        conf.put(NuShellConfig.TOPOLOGY_NUMULTILANG_HEARTBEAT_PERIOD_MS, 10*1000);
+        conf.put(NuShellConfig.TOPOLOGY_NUMULTILANG_HEARTBEAT_TIMEOUT_MS, Integer.MAX_VALUE);
+        conf.put(NuShellConfig.TOPOLOGY_NUMULTILANG_CODE_DIR, boltPath.toString());
         context = mock(TopologyContext.class);
         when(context.getThisComponentId()).thenReturn("test-component-id");
         when(context.getPIDDir()).thenReturn(Files.createTempDirectory("test-pids").toAbsolutePath().toString());
-        bolt.prepare(conf, context, collector);
     }
 
     @Test
-    public void testPythonBolt() throws Throwable {
+    public void testSpiltSentenceBolt() throws Throwable {
+        bolt = new NuShellBolt("python", boltPath.resolve("splitsentence.py").toString());
+        bolt.prepare(conf, context, collector);
         Tuple tuple = mock(Tuple.class);
         when(tuple.getSourceComponent()).thenReturn("test-component-bolt");
         when(tuple.getSourceStreamId()).thenReturn("test-stream-id");
@@ -101,6 +100,19 @@ public class PythonTest {
         bolt.execute(tuple);
         assertEmittedString("Hello");
         assertEmittedString("World");
+    }
+
+    @Test
+    public void testReadFileBolt() throws Throwable {
+        bolt = new NuShellBolt("python", boltPath.resolve("readfile.py").toString());
+        bolt.prepare(conf, context, collector);
+        Tuple tuple = mock(Tuple.class);
+        when(tuple.getSourceComponent()).thenReturn("test-component-bolt");
+        when(tuple.getSourceStreamId()).thenReturn("test-stream-id");
+        when(tuple.getSourceTask()).thenReturn(0);
+        when(tuple.getValues()).thenReturn(Lists.newArrayList((Object) ""));
+        bolt.execute(tuple);
+        assertEmittedString("Hello World");
     }
 
     private void assertEmittedString(String value) throws Throwable {
