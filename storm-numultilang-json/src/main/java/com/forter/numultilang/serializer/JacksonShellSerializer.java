@@ -1,5 +1,6 @@
 package com.forter.numultilang.serializer;
 
+import backtype.storm.task.TopologyContext;
 import backtype.storm.utils.Utils;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -40,6 +41,7 @@ public class JacksonShellSerializer implements ShellSerializer {
         ObjectMapper mapper = new ObjectMapper();
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         mapper.addMixInAnnotations(ShellResponseMsg.class, ShellResponseMsgMixin.class);
+        mapper.addMixInAnnotations(TopologyContext.class, TopologyContextMixin.class);
         return mapper;
     }
 
