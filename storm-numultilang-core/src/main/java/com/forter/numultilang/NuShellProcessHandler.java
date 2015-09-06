@@ -17,7 +17,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class NuShellProcessHandler extends NuAbstractProcessHandler implements NuProcessHandler {
 
-    private final ConcurrentLinkedQueue<ByteBuffer> pendingWrites;
     private final ShellMsgListener messageListener;
     private final ShellProcessErrorListener errorListener;
     private final ShellProcessStdErrListener stdErrListener;
@@ -31,9 +30,6 @@ public class NuShellProcessHandler extends NuAbstractProcessHandler implements N
             ShellProcessErrorListener errorListener,
             ShellProcessStdErrListener stdErrListener) {
         this.stdErrListener = stdErrListener;
-
-        pendingWrites = new ConcurrentLinkedQueue();
-
         this.serializer = serializer;
         this.messageListener = messageListener;
         this.errorListener = errorListener;
@@ -42,9 +38,8 @@ public class NuShellProcessHandler extends NuAbstractProcessHandler implements N
 
     public void writeMessage(Object message) {
         for (ByteBuffer bytes: serializer.serialize(message)) {
-            pendingWrites.add(bytes);
+            nuProcess.writeStdin(bytes);
         }
-        nuProcess.wantWrite();
     }
 
     @Override
@@ -89,38 +84,10 @@ public class NuShellProcessHandler extends NuAbstractProcessHandler implements N
 
     /** {@inheritDoc} */
     @Override
-    public boolean onStdinReady(ByteBuffer directStdinBuffer) {
-        try {
-            return onStdinReadyInternal(directStdinBuffer);
-        }
-        catch (Throwable t) {
-            errorListener.onInternalError(t);
-            return false;
-        }
+    public boolean onStdinReady(ByteBuffer buffer) {
+        errorListener.onInternalError(new UnsupportedOperationException("onStdinReady should not be called."));
+        return false;
     }
 
-    private boolean onStdinReadyInternal(ByteBuffer directStdinBuffer) {
-        boolean hasMore = false;
-        while(!pendingWrites.isEmpty()) {
-            final int stdinLimit = directStdinBuffer.limit();
-            // copy the next buffer into our direct buffer (inBuffer)
-            ByteBuffer nextBuffer = pendingWrites.peek();
-            final int nextBufferRemaining = nextBuffer.remaining();
-
-            if (nextBufferRemaining > stdinLimit) {
-                ByteBuffer slice = nextBuffer.slice();
-                slice.limit(stdinLimit);
-                directStdinBuffer.put(slice);
-                nextBuffer.position(nextBuffer.position() + stdinLimit);
-                hasMore = true;
-                break;
-            } else {
-                directStdinBuffer.put(nextBuffer);
-                pendingWrites.poll();
-            }
-        }
-        directStdinBuffer.flip();
-        return hasMore;
-    }
 }
 
